@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Asrama {
+  name   String
+  sex    SexType  @default(LK)
+  Master Master[]
+
+  @@id([name, sex])
+}
+
+model Kelas {
+  name   String
+  sex    SexType  @default(LK)
+  Master Master[]
+
+  @@id([name, sex])
+}
+
+model Keluhan {
+  name   String   @id
+  Master Master[]
+}
+
+model Master {
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  returnAt    DateTime?
+  kelasId     String?
+  asramaId    String
+  description String?
+  room        String?
+  returnTo    ReturnTo?
+  studentId   String
+  sex         SexType
+  Asrama      Asrama    @relation(fields: [asramaId, sex], references: [name, sex])
+  Kelas       Kelas?    @relation(fields: [kelasId, sex], references: [name, sex])
+  Student     Student   @relation(fields: [studentId], references: [id])
+  Keluhan     Keluhan[]
+}
+
+model Student {
+  id      String   @id
+  name    String
+  address String
+  sex     SexType
+  Master  Master[]
+}
+
+model User {
+  id       String   @id
+  name     String
+  username String   @unique
+  password String
+  role     RoleUser @default(USER)
+  type     TypeUser @default(LK)
+}
+
+enum ReturnTo {
+  RUMAH
+  RS
+  ASRAMA
+}
+
+enum RoleUser {
+  ADMIN
+  USER
+  ASRAMA
+}
+
+enum SexType {
+  LK
+  PR
+  ALL
+}
+
+enum TypeUser {
+  ALL
+  LK
+  PR
+}
